@@ -5,14 +5,14 @@ const userRoutes = require('./Routes/userRoutes');
 const authRoutes = require('./Routes/authRoutes');
 const AuthMiddleware = require('./middleware/authorization');
 const app = express();
-const PORT = 6060;
+const PORT = 5050;
 
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 //route
 app.use('/api', authRoutes);
-app.use(AuthMiddleware);
+// app.use(AuthMiddleware);
 app.use('/api', categoryRoutes);
 app.use('/api', userRoutes);
 

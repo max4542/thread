@@ -2,47 +2,33 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const UserRepository = require('../Repository/userRepository');
 const ResponseTrait = require('../traits/responseTrait');
-
+const twilio = require("../config/twilio");
 const userRepo = new UserRepository();
 
 class AuthController {
-
-  static async register(req, res) {
+  static async sendotp(req, res) {
+    const { countryCode, phoneNumber } = req.body;
+    if (!countryCode || !phoneNumber) return ResponseTrait.error(res, 'Country code and phone number are required', 400);
+    const fullPhoneNumber = `${countryCode}${phoneNumber}`;
     try {
-      const { name, email, githubUsername, password, phoneNumber } = req.body;
-
-      // Check if user exists
-      const existingUser = await userRepo.findOne({where : {email: email , github_username:githubUsername}});
-      if (existingUser) return ResponseTrait.error(res, 'User exists', 400);
-
-      // Hash password and create user
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = await userRepo.create({ name, email, github_username:githubUsername, password: hashedPassword, phone_number:phoneNumber });
-
-      return ResponseTrait.success(res, newUser, 'User registered', 201);
+      const verification = await twilio.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID).verifications.create({ to: fullPhoneNumber, channel: 'sms' });
+      if (verification.status === 'pending') return ResponseTrait.success(res, null, 'OTP sent successfully');
+      return ResponseTrait.error(res, 'Failed to send OTP', 500);
     } catch (error) {
-      return ResponseTrait.error(res, error.message, 400);
+      return ResponseTrait.error(res, error.message, 500);
     }
   }
 
-  static async login(req, res) {
+  static async verifyotp(req, res) {
+    const { countryCode, phoneNumber, otp } = req.body;
+    if (!countryCode || !phoneNumber || !otp) return ResponseTrait.error(res, 'Country code, phone number, and OTP are required', 400);
+    const fullPhoneNumber = `${countryCode}${phoneNumber}`;
     try {
-      const { email, password } = req.body;
-      
-      // Find user and validate password
-      const user = await userRepo.findOne({where:{ email :email} });
-      if (!user) return ResponseTrait.error(res, 'User not found', 404);
-      if (!await bcrypt.compare(password, user.password)) return ResponseTrait.error(res, 'Invalid credentials', 401);
-
-      // Generate JWT token
-      const token = jwt.sign(
-        { id: user.id, name: user.name, githubUsername: user.github_username, email: user.email, image: user.image, phoneNumber: user.phone_number, admin: user.admin },
-        process.env.JWT_SECRET || 'your_jwt_secret', { expiresIn: '1h' }
-      );
-
-      return ResponseTrait.success(res, { token }, 'Login successful');
+      const verificationCheck = await twilio.verify.services(process.env.TWILIO_VERIFY_SERVICE_SID).verificationChecks.create({ to: fullPhoneNumber, code: otp });
+      if (verificationCheck.status === 'approved') return ResponseTrait.success(res, null, 'OTP verified successfully');
+      return ResponseTrait.error(res, 'Invalid OTP', 400);
     } catch (error) {
-      return ResponseTrait.error(res, error.message, 400);
+      return ResponseTrait.error(res, error.message, 500);
     }
   }
 }

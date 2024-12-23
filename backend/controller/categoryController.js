@@ -2,7 +2,7 @@ const CategoryRepository = require("../Repository/categoryRepository");
 const ResponseTrait = require("../traits/responseTrait");
 const Category = require("../models/categroyModel");
 const categoryRepo = new CategoryRepository();
-const { sequelize } = require("../model/baseModel");
+const { sequelize } = require("../models/baseModel");
 
 const createCategory = async (req, res) => 
   ResponseTrait.success(res, await categoryRepo.create({...req.body, created_by: req.user.id}), "Category created successfully", 201);
