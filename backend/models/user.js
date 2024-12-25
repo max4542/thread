@@ -20,7 +20,7 @@ const User = sequelize.define(
     github_username: {
       // Changed to underscore
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       unique: true, // Ensure unique GitHub username
     },
     image: {
@@ -30,11 +30,11 @@ const User = sequelize.define(
     phone_number: {
       // Changed to underscore
       type: DataTypes.STRING,
-      allowNull: true,
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     admin: {
       type: DataTypes.ENUM("0", "1"), // Enum for admin role

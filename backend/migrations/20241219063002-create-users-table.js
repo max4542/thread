@@ -19,7 +19,7 @@ module.exports = {
       },
       github_username: { // Changed to underscore
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
         unique: true, // Ensure unique GitHub username
       },
       image: {
@@ -28,11 +28,11 @@ module.exports = {
       },
       phone_number: { // Changed to underscore
         type: Sequelize.STRING,
-        allowNull: true,
+        allowNull: false,
       },
       password: { // Added password field
         type: Sequelize.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       admin: {
         type: Sequelize.ENUM('0', '1'), // Enum for admin role
