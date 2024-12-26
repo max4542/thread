@@ -4,7 +4,9 @@ const { TWILIO_VERIFY_SERVICE_SID,JWT_SECRET } = process.env;
 const UserRepository = require('../Repository/userRepository');
 const jwt = require('jsonwebtoken');
 const userRepo = new UserRepository();
+
 class AuthController {
+
   static async sendotp(req, res) {
     const { countryCode, phoneNumber } = req.body;
     if (!countryCode || !phoneNumber) return ResponseTrait.error(res, 'Country code and phone number are required', 400);
@@ -38,3 +40,5 @@ class AuthController {
   }
 
 }
+
+module.exports = AuthController; 
