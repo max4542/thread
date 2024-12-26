@@ -20,7 +20,7 @@ class AuthController {
     const { countryCode, phoneNumber, otp } = req.body;
     if (!countryCode || !phoneNumber || !otp) return ResponseTrait.error(res, 'Country code, phone number, and OTP are required', 400);
     try {
-      const verificationCheck = await twilioClient.verify.v2.services(TWILIO_VERIFY_SERVICE_SID).verificationChecks.create({ to: `${countryCode}${phoneNumber}`, code: otp });
+      const verificationCheck = await twilioClient.verify.v2.services('VA8169c778532b2c133c9494e9273a2d48').verificationChecks.create({ to: `${countryCode}${phoneNumber}`, code: otp });
       if (verificationCheck.status !== 'approved') {
         return ResponseTrait.error(res, 'Invalid OTP', 400);
       }
@@ -36,33 +36,5 @@ class AuthController {
       return ResponseTrait.error(res, 'An error occurred while verifying OTP', 500);
     }
   }
-  static async register(req, res) {
-    const { name, email, github_username, phone_number, admin = '0' } = req.body;
-
-    // Check if all fields are provided
-    if (!name || !email  || !phone_number) return ResponseTrait.error(res, 'Name, email and phone number are required', 400);
-
-    try {
-      const existingUserByEmail = await userRepo.findOne({ where: { email } });
-      if (existingUserByEmail) return ResponseTrait.error(res, 'Email is already registered', 400);
-
-      const existingUserByPhone = await userRepo.findOne({ where: { phone_number } });
-      if (existingUserByPhone) return ResponseTrait.error(res, 'Phone number is already registered', 400);
-
-      const newUser = await userRepo.create({name,email,github_username,phone_number,admin});
-
-      const token = jwt.sign(
-        { id: newUser.id, name: newUser.name, githubUsername: newUser.github_username, email: newUser.email, image: newUser.image, phoneNumber: newUser.phone_number, admin: newUser.admin },
-        JWT_SECRET || 'your_jwt_secret', { expiresIn: '1h' }
-      );
-
-      return ResponseTrait.success(res, { token }, 'User registered successfully and JWT generated');
-    } catch (error) {
-      console.log(error);
-      return ResponseTrait.error(res, 'An error occurred during registration', 500);
-    }
-  }
 
 }
-
-module.exports = AuthController;

@@ -1,24 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+
+import { BrowserRouter as Router, Routes, Route,Navigate } from 'react-router-dom';
+import Login from './component/Auth/Login';
+import User from './component/User/User';
+import ProtectedRoute from './utils/ProtectedRoute'; 
+import { isTokenValid } from './utils/jwtTokenUtils';
+
+const isAuthenticated = isTokenValid();
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        {/* Public route: Login page */}
+        <Route path="/login" element={<Login />} />
+
+        {/* Protected route: User page, only accessible if the token is valid */}
+        <Route path="/user" element={<ProtectedRoute component={User} />} />
+        <Route path="/" element={<Navigate to={isAuthenticated ? "/user" : "/login"} />} />
+        {/* Add other routes here */}
+      </Routes>
+    </Router>
   );
 }
 
