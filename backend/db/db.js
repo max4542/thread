@@ -10,7 +10,7 @@ const { Sequelize } = require('sequelize');
 const config = {
   database: process.env.DATABASE_NAME,
   username: process.env.DATABASE_USER,
-  password: "",
+  password: process.env.DATABASE_PASSWORD,
   host: process.env.DATABASE_HOST,
   dialect: process.env.DATABASE_DIALECT,
   pool: {
@@ -26,7 +26,7 @@ const sequelize = new Sequelize(config.database, config.username, config.passwor
   host: config.host,
   dialect: config.dialect,
   pool: config.pool,
-  timezone: process.env.TIMEZONE, // Load timezone from .env
+ // timezone: process.env.TIMEZONE, // Load timezone from .env
 });
 
 // Authenticate database connection

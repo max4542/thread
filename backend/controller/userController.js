@@ -6,8 +6,15 @@ const { TWILIO_VERIFY_SERVICE_SID } = process.env;
 const userRepo = new UserRepository();
 
 async function getUsers(req, res) {
-  try { const users = await userRepo.findAll(); return ResponseTrait.success(res, users, 'Users fetched successfully'); } 
-  catch (error) { return ResponseTrait.error(res, error.message, 400); }
+  try {
+    const users = await userRepo.findAll(); // Fetches all users
+    return res.status(200).json({
+      message: 'Users fetched successfully',
+      data: users, // Sends an array of users in the `data` field
+    });
+  } catch (error) {
+    return ResponseTrait.error(res, error.message, 400); // Sends an error response
+  }
 }
 
 async function updateUser(req, res) {
@@ -41,7 +48,7 @@ async function verfiyNewFactor(req, res) {
         factorType: "totp", 
         friendlyName: req.user.name,
       });
-      return ResponseTrait.success(res, newFactor, '2fa');
+      return ResponseTrait.success(res, Factor, '2fa');
   } catch (error) {
     console.error("Error creating TOTP factor:", error.message);
   }
