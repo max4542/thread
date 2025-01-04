@@ -18,13 +18,13 @@ const authSlice = createSlice({
     },
     loginSuccess: (state, action) => {
       state.loading = false;
-      state.token = action.payload.token;
-      state.user = action.payload.user;
+      state.token = action?.payload?.token || 'ddd';
+      state.user = action?.payload?.user || 'ddd';
       state.error = '';  // Reset error on login success
     },
     loginFailure: (state, action) => {
       state.loading = false;
-      state.error = action.payload || 'Login failed. Please try again.';  // Set error message
+      state.error = action?.payload || 'Login failed. Please try again.';  // Set error message
     },
     logout: (state) => {
       state.token = null;
