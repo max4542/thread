@@ -1,8 +1,10 @@
 const { Server } = require('socket.io');
 const userConnectionRepository = require('../Repository/userConnectionRepository');
-
+const messageRepository = require('../Repository/messageRepository');
 // Initialize the repository for the UserConnection model
 const connRepo = new userConnectionRepository();
+const messageRepo = new messageRepository();
+
 const setupSocketIO = (server) => {
   const io = new Server(server, {
     cors: {
@@ -66,7 +68,8 @@ const setupSocketIO = (server) => {
         try {
           const recipientConnection = await connRepo.findOne({ where: { user_id: recipientId } });
       
-          if (recipientConnection?.socket_id) {
+          if (recipientConnection?.status) {
+            await messageRepo.create({ sender_id: senderId, receiver_id: recipientId , content : message});
             io.to(recipientConnection.socket_id).emit('chatMessage', { senderId, message, timestamp: new Date() });
           } else {
             socket.emit('userOffline', { recipientId, message: 'User is offline' });
